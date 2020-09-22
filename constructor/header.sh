@@ -437,11 +437,17 @@ export FORCE
 # https://github.com/conda/conda/pull/9073
 mkdir -p ~/.conda > /dev/null 2>&1
 
-CONDA_SAFETY_CHECKS=disabled \
-CONDA_EXTRA_SAFETY_CHECKS=no \
-CONDA_CHANNELS=__CHANNELS__ \
-CONDA_PKGS_DIRS="$PREFIX/pkgs" \
-"$CONDA_EXEC" install --offline --file "$PREFIX/pkgs/env.txt" -yp "$PREFIX" || exit 1
+#CONDA_SAFETY_CHECKS=disabled \
+#CONDA_EXTRA_SAFETY_CHECKS=no \
+#CONDA_CHANNELS=__CHANNELS__ \
+#CONDA_PKGS_DIRS="$PREFIX/pkgs" \
+#"$CONDA_EXEC" install --offline --file "$PREFIX/pkgs/env.txt" -yp "$PREFIX" || exit 1
+# ^^^^^^ original command
+# Using the other method makes it so that conda.exe tries to solve for the
+# environment. Until this gets solved upstream, I would rather simply install
+# the package files directly from their tar version
+# https://github.com/conda/constructor/issues/319
+"$CONDA_EXEC" install $PREFIX/pkgs/*.tar.bz2 -yp "$PREFIX" || exit 1
 
 if [ "$KEEP_PKGS" = "0" ]; then
     rm -fr $PREFIX/pkgs/*.tar.bz2
